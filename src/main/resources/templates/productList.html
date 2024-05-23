@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
+    <title>Товари системи інвентаризації</title>
+</head>
+<body>
+
+    <header>
+        <ul>
+            <li><a href="\products">Товари</a></li>
+            <li><a href="\companies">Компанії</a></li>
+            <li><a href="\users">Користувачі</a></li>
+            <li style="float:right; margin: 15px">
+                <form action="products" method="get">
+                    <input type="text" name="search">
+                    <input type="submit" value="Пошук товарів">
+                </form>
+            </li>
+        </ul>
+    </header>
+
+    <h1>Додані товари</h1>
+
+    <ul>
+        <li th:each="product : ${products}">
+            <span th:text="${product.name}" />
+            (<span th:text="${product.category}" />) для
+            "<span th:text="${product.user.name}" />" від
+            "<span th:text="${product.company.name}" />" Доступно:
+            <input type="checkbox" th:checked="${product.available}" disabled>
+            <form action="/products/delete" method="post" style="display: inline" sec:authorize="hasRole('ADMIN')">
+                <input type="hidden" name="productId" th:value="${product.ID}">
+                <input type="submit" value="Видалити">
+            </form>
+        </li>
+    </ul>
+
+   <h1 sec:authorize="hasRole('MANAGER')">Додати товар</h1>
+
+    <form sec:authorize="hasRole('MANAGER')" action="/products/create" method="post" id="create-form" th:object="${newProduct}">
+        <div>
+            <label for="name">Назва:</label>
+            <input type="text" id="name" th:field="*{name}" minlength="3" maxlength="100">
+        </div>
+        <div>
+            <label for="category">Категорія:</label>
+            <input type="text" id="category" th:field="*{category}" minlength="3" maxlength="100">
+        </div>
+        <div>
+            <label for="available">Доступно:</label>
+            <input type="checkbox" id="available" th:field="*{available}">
+        </div>
+        <div>
+            <label for="userID">Користувач:</label>
+            <select id="userID" name="userID" form="create-form">
+                <option th:each="user : ${availableUsers}" th:value="${user.ID}" th:text="${user.name}">
+            </select>
+        </div>
+        <div>
+            <label for="companyID">Компанія:</label>
+            <select id="companyID" name="companyID" form="create-form">
+                <option th:each="company : ${availableCompanies}" th:value="${company.ID}" th:text="${company.name}">
+            </select>
+        </div>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
+    <title>Компанії системи інвентаризації</title>
+</head>
+<body>
+
+    <header>
+        <ul>
+            <li><a href="\products">Товари</a></li>
+            <li><a href="\companies">Компанії</a></li>
+            <li><a href="\users">Користувачі</a></li>
+        </ul>
+    </header>
+
+    <h1>Зареєстровані компанії</h1>
+
+    <ul>
+        <li th:each="company : ${companies}">
+            <span th:text="${company.name}" /> -
+            <span th:text="${company.phone}" />
+            (<span th:text="${company.country}" />)
+            <form action="/companies/delete" method="post" style="display: inline" sec:authorize="hasRole('ADMIN')">
+                <input type="hidden" name="companyId" th:value="${company.ID}">
+                <input type="submit" value="Delete">
+            </form>
+        </li>
+    </ul>
+
+   <h1 sec:authorize="hasRole('MANAGER')">Зареєструвати компанію</h1>
+
+    <form sec:authorize="hasRole('MANAGER')" action="/companies/register" method="post">
+        <div>
+            <label for="name">Назва:</label>
+            <input type="text" id="name" name="name" minlength="3" maxlength="100">
+        </div>
+        <div>
+            <label for="phone">Телефон:</label>
+            <input type="tel" id="phone" name="phone" pattern="[0-9]{1-3}-?[0-9]{1-3}-?[0-9]{1-4}">
+        </div>
+        <div>
+            <label for="country">Країна:</label>
+            <input type="text" id="country" name="country" minlength="3" maxlength="15">
+        </div>
+        <input type="submit" id="submit" value="Submit">
+    </form>
+
+</body>
+</html>
